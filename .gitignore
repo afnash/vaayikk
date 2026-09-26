@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+test-results/
+playwright-report/
+*.tsbuildinfo
+next-env.d.ts
+public/pdf.worker.min.mjs
+public/cmaps/
+public/standard_fonts/
+public/wasm/
+public/offline-assets.json

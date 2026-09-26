@@ -1,0 +1,38 @@
+[
+  {
+    "id": "noticing",
+    "title": "The Art of Noticing",
+    "color": "#dce1c8",
+    "collection": "everyday"
+  },
+  {
+    "id": "morning",
+    "title": "A Slower Kind of Morning",
+    "color": "#bb573b",
+    "collection": "everyday"
+  },
+  {
+    "id": "quiet",
+    "title": "The Quiet Between",
+    "color": "#ebe4d4",
+    "collection": "creative"
+  },
+  {
+    "id": "elsewhere",
+    "title": "Somewhere, Else",
+    "color": "#a7bfca",
+    "collection": "fiction"
+  },
+  {
+    "id": "focus",
+    "title": "A Field Guide to Focus",
+    "color": "#2e493e",
+    "collection": "creative"
+  },
+  {
+    "id": "pleasures",
+    "title": "Small Pleasures",
+    "color": "#ded5e0",
+    "collection": "everyday"
+  }
+]
