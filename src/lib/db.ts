@@ -11,7 +11,7 @@ class FolioDatabase extends Dexie {
   bookmarks!: Table<Bookmark, string>;
   collections!: Table<Collection, string>;
   preferences!: Table<{ key: string; value: string }, string>;
-  constructor() { super("folio-library"); this.version(1).stores({ books: "id, title, dateAdded, lastOpened, *collectionIds", bookmarks: "id, bookId, [bookId+pageNumber]", collections: "id, name", preferences: "key" }); }
+  constructor() { super("folio-library"); this.version(1).stores({ books: "id, title, dateAdded, lastOpened, *collectionIds", bookmarks: "id, bookId, [bookId+pageNumber]", collections: "id, name, createdAt", preferences: "key" }); }
 }
 export const db = new FolioDatabase();
 let initialization: Promise<void> | undefined;

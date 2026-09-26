@@ -1,295 +1,59 @@
-# 📚 Vaayikk
+# Folio
 
-**Your PDFs. Your library. Your device.**
+A warm, private reading room for your PDFs. Android-first, with a responsive desktop library. No accounts, backend, analytics, remote fonts, or document uploads.
 
-Vaayikk is an Android-first, local-first Progressive Web App that turns locally stored PDF files into a clean, book-like reading experience.
+## Run locally
 
-Instead of treating PDFs like documents that need to be continuously scrolled, vaayikk presents them like real ebooks — with page-by-page navigation, a personal bookshelf, reading progress, bookmarks, collections, and offline access.
+Requires Node.js 20.9+ and npm.
 
----
-
-## ✨ Features
-
-### 📖 Book-like PDF Reader
-
-- Single-page reading experience
-- Swipe left/right to turn pages
-- Tap page edges for navigation
-- Pinch-to-zoom
-- Immersive fullscreen reading
-- Jump to any page using the progress slider
-- Light, dark, and sepia reading modes
-
-### 📚 Personal Library
-
-Import PDFs directly from your device and organize them into a visual bookshelf.
-
-- Automatic cover generation from the first page
-- Grid and list views
-- Recently added books
-- Continue reading
-- Favorites
-- Custom collections
-- Reading / Finished filters
-- Library search
-
-### 🔖 Bookmarks
-
-Save important pages while reading.
-
-Bookmarks are stored locally and can be reopened instantly from the book's bookmark panel.
-
-### 📊 Reading Progress
-
-vaayikk automatically remembers:
-
-- Current page
-- Total pages
-- Reading percentage
-- Last opened time
-- Finished books
-
-Close the app and return later — vaayikk opens exactly where you stopped.
-
-### 📴 Offline First
-
-vaayikk is designed to work without an internet connection.
-
-Once installed and the required resources are cached, your library remains available offline.
-
-No server is required for reading.
-
-### 🔐 Privacy First
-
-Your books belong to you.
-
-vaayikk does not require:
-
-- Accounts
-- Authentication
-- Cloud uploads
-- Remote PDF processing
-
-PDFs, bookmarks, collections, and reading progress remain on your device.
-
----
-
-## 🛠 Tech Stack
-
-- **Next.js**
-- **TypeScript**
-- **Tailwind CSS**
-- **shadcn/ui**
-- **PDF.js**
-- **Dexie.js**
-- **IndexedDB**
-- **Framer Motion**
-- **Progressive Web App APIs**
-
----
-
-## 🗂 Local Data
-
-vaayikk stores application data locally using IndexedDB.
-
-### Books
-
-```text
-id
-title
-filename
-pdfBlob
-coverBlob
-totalPages
-currentPage
-progress
-favorite
-dateAdded
-lastOpened
-collectionIds
-```
-
-### Bookmarks
-
-```text
-id
-bookId
-pageNumber
-createdAt
-```
-
-### Collections
-
-```text
-id
-name
-createdAt
-```
-
-Future versions may use OPFS or supported filesystem APIs for improved handling of very large PDF libraries.
-
----
-
-## 📱 Android PWA
-
-vaayikk is primarily designed for Android devices.
-
-It can be installed directly from a supported browser and launched in standalone mode, providing an app-like experience without browser navigation controls.
-
-The UI is optimized primarily for **360–480px mobile displays** while remaining responsive on tablets and desktop devices.
-
----
-
-## 🧭 Basic Flow
-
-```text
-Import PDF
-     ↓
-Generate Cover
-     ↓
-Add to Library
-     ↓
-Open Book
-     ↓
-Swipe / Turn Pages
-     ↓
-Bookmark + Track Progress
-     ↓
-Close App
-     ↓
-Resume From Last Page
-```
-
----
-
-## 🚀 Getting Started
-
-Clone the repository:
-
-```bash
-git clone <repository-url>
-cd vaayikk
-```
-
-Install dependencies:
-
-```bash
+```sh
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Open:
+Open http://localhost:3000. On Windows PowerShell with restricted script execution, use `npm.cmd` instead of `npm`.
 
-```text
-http://localhost:3000
+## Production and offline use
+
+```sh
+npm run build
+npm run start
 ```
 
-For testing on an Android device, run the development server on your local network and access it from the phone, or deploy the PWA over HTTPS.
+The build creates a fully static `out/` directory. Deploy that directory to any HTTPS static host, at the domain root. A backend is not needed. Configure `/sw.js` and `/offline-assets.json` to revalidate rather than caching them indefinitely. The PDF.js worker must be served with a JavaScript MIME type.
 
----
+The production service worker precaches the app, PDF worker, fonts, character maps, WASM decoders, icons, and starter books. Wait for **Ready for offline reading** before going offline. Offline caching is intentionally disabled during development. Install from Chrome on Android using **Add to home screen → Install**. HTTPS (or localhost for testing) is required for service workers and installation.
 
-## 🧪 Development & Testing
+## Features
 
-The project can be developed alongside:
+- Multiple PDF import and desktop drag-and-drop; local first-page cover generation and PDF title/author metadata.
+- Grid/list library, title/filename/collection search, sorting, favorites, editable titles, custom collections, book information, and removal.
+- Single-page PDF reader with swipes, left/right taps, arrow keys, direct page slider, center-tap immersive mode, native fullscreen, pinch zoom, and bounded panning.
+- Automatic reading position, progress, last-opened timestamp, and page bookmarks; finished at 98% progress.
+- Persistent light, dark, and sepia appearance; mobile bottom sheets and safe-area support.
+- Six original short reading samples, with custom cover art and actual locally bundled PDFs. Samples are marked as Folio Originals and can be removed. They never reappear after removal.
 
-- **Playwright** — mobile viewport and end-to-end testing
-- **Chrome DevTools** — PWA, IndexedDB, service worker and performance debugging
-- **Context7** — current framework/library documentation
-- **GitHub** — source control and development workflow
+## Storage and privacy
 
-Important test flows include:
+Dexie stores PDF and cover blobs, metadata, collections, bookmarks, and preferences in the browser's IndexedDB. The app does not send imported files anywhere. It requests persistent browser storage after import when supported. Data belongs to this browser and origin: clearing site data, removing the browser profile, or browser storage eviction may remove the library. Keep original PDFs separately. Imports currently support PDFs up to 250 MB; password-protected PDFs need an unlocked copy.
 
-```text
-Import PDF
-→ Verify cover
-→ Open book
-→ Navigate pages
-→ Bookmark page
-→ Close reader
-→ Reopen book
-→ Verify reading position
-→ Verify bookmark
-→ Enable offline mode
-→ Verify book remains readable
+Dark/sepia modes adjust the rendered page using color filters; PDF layout remains fixed, without ebook text reflow. V1 does not implement text search, annotations, or cloud sync.
+
+## Architecture
+
+`src/lib/db.ts` owns the IndexedDB schema and library operations; `src/lib/pdf.ts` owns document loading and import. UI is in `src/components/folio-app.tsx`, with the reader separately loaded from `reader.tsx`. Reusable shadcn-style Button and Radix Dialog-based Sheet live in `src/components/ui/`. Tailwind 4 and semantic CSS supply responsive themes. Framer Motion handles library and page transitions.
+
+`scripts/prepare-assets.mjs` copies the local PDF.js runtime assets and generates PWA icons and original starter books. `scripts/prepare-offline.mjs` fingerprints the static build and creates the service worker's precache manifest. All runtime resources are same-origin.
+
+## Verification
+
+```sh
+npm run typecheck
+npm run build
+npx playwright install chromium
+npm test
 ```
 
----
+The Playwright suite uses the production build and verifies PDF import, rendering, progress/resume, bookmarks, favorites, rename, collection search, removal, persistent appearance, mobile swipes and pinch/pan, invalid PDF handling, and offline reload/import/reading.
 
-## 🗺 Roadmap
-
-### V1 — Core Reader
-
-- [ ] Local PDF import
-- [ ] Automatic book covers
-- [ ] Bookshelf
-- [ ] Paged PDF reader
-- [ ] Swipe navigation
-- [ ] Pinch-to-zoom
-- [ ] Reading progress
-- [ ] Bookmarks
-- [ ] Favorites
-- [ ] Collections
-- [ ] Search library
-- [ ] Dark mode
-- [ ] Sepia mode
-- [ ] Offline PWA
-- [ ] Android installation
-
-### V2 — Better Reading
-
-- [ ] Highlights
-- [ ] Notes
-- [ ] PDF text search
-- [ ] Two-page tablet mode
-- [ ] Reading statistics
-- [ ] Reading goals
-- [ ] Improved page-turn animations
-- [ ] OPFS storage
-- [ ] Export/import library metadata
-
-### V3 — Smart Library
-
-Potential optional AI features:
-
-- [ ] Ask this book
-- [ ] Explain selected text
-- [ ] Chapter summaries
-- [ ] Semantic book search
-- [ ] Search across the entire library
-- [ ] Generate flashcards
-- [ ] Generate quizzes
-- [ ] Local/remote RAG support
-
-AI functionality should remain optional and separate from the core offline reading experience.
-
----
-
-## 🎯 Project Philosophy
-
-vaayikk should feel like a **bookshelf, not a file manager**.
-
-The reader should disappear while you're reading.
-
-The application should remain:
-
-**Fast. Minimal. Offline. Private. Book-first.**
-
----
-
-## 📄 License
-
-This project is currently being developed as a personal/open-source experimental project.
-
-License information will be added before the first public release.
-
----
-
-<p align="center">
-  <strong>vaayikk</strong><br>
-  Turn your PDF folder into a library.
-</p>
+To use an existing Google Chrome installation instead of downloading Chromium, set `FOLIO_BROWSER_CHANNEL=chrome` before running the tests.

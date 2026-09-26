@@ -8,7 +8,7 @@ export async function getPdfJs() {
 }
 export async function loadPdf(blob: Blob): Promise<PDFDocumentProxy> {
   const pdf = await getPdfJs();
-  return pdf.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), cMapUrl: "/cmaps/", cMapPacked: true, standardFontDataUrl: "/standard_fonts/", wasmUrl: "/wasm/", isEvalSupported: false }).promise;
+  return pdf.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), cMapUrl: "/cmaps/", cMapPacked: true, standardFontDataUrl: "/standard_fonts/", wasmUrl: "/wasm/" }).promise;
 }
 export async function importPdf(file: File): Promise<Book> {
   if (!/\.pdf$/i.test(file.name) && file.type !== "application/pdf") throw new Error("Please choose a PDF file.");
